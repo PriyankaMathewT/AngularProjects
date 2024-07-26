@@ -1,26 +1,32 @@
 
-import { HttpClient } from '@angular/common/http';
 import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { NavComponent } from "./nav/nav.component";
+import { AccountService } from './_services/account.service';
+import { HomeComponent } from "./home/home.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, NavComponent, HomeComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent  implements OnInit{
+export class AppComponent implements OnInit {
   title = 'client';
-  http=inject(HttpClient);
+  private accountservice = inject(AccountService);
   users: any;
-  
-  ngOnInit(): void 
-  {
-    this.http.get('https://localhost:5001/API/Users').subscribe({
-    next: (response: any)=>this.users=response,
-    error: (error: any)=>console.log(error),
-    complete: () =>console.log("Request has been completed")
-    })
+
+  ngOnInit(): void {
+this.setCurrentUser();
+  }
+
+
+  setCurrentUser() {
+    const userstring = localStorage.getItem('user');
+    if (!userstring) return;
+    const user = JSON.parse(userstring);
+    this.accountservice.currentUser.set(user);
+
   }
 }
